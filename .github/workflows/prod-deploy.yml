@@ -36,6 +36,9 @@ jobs:
           # Install dependencies
           npm install --production
 
+          # Build application
+          npm run build
+
           # Restart application with PM2
           export NODE_ENV=production
           pm2 restart evently || pm2 start npm --name "evently" -- run start
