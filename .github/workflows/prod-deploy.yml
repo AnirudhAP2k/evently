@@ -38,7 +38,7 @@ jobs:
 
           # Restart application with PM2
           export NODE_ENV=production
-          pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- run start
+          pm2 restart evently || pm2 start npm --name "evently" -- run start
 
           # Save PM2 process list (optional)
           pm2 save
