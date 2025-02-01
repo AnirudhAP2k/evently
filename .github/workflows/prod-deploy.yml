@@ -1,0 +1,44 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Deployment on EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          # Navigate to the deployment directory
+          cd ${{ secrets.EC2_DEPLOY_PATH }}
+
+          # Ensure repository is up to date
+          git fetch origin
+          git reset --hard origin/master
+
+          # Install dependencies
+          npm install --production
+
+          # Restart application with PM2
+          export NODE_ENV=production
+          pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- run start
+
+          # Save PM2 process list (optional)
+          pm2 save
