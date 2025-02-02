@@ -30,8 +30,8 @@ jobs:
           cd ${{ secrets.EC2_DEPLOY_PATH }}
 
           # Ensure repository is up to date
-          git fetch origin
-          git reset --hard origin/master
+          git checkout -f
+          git pull origin master
 
           # Install dependencies
           npm install --production
