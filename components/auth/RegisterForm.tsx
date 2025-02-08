@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from "@/lib/validation";
+import { RegisterSchema } from "@/lib/validation";
 import { z } from 'zod';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
@@ -22,28 +22,30 @@ import { FormErrors } from "@/components/FormErrors";
 import { FormSuccess } from '@/components/FormSuccess';
 import { useRouter } from 'next/navigation';
 
-const LoginForm = () => {
+const RegisterForm = () => {
     const [errors, setErrors] = useState("");
     const [success, setSuccess] = useState("");
     const [isPending, setIsPending] = useState(false);
 
     const router = useRouter();
 
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
+    const form = useForm<z.infer<typeof RegisterSchema>>({
+        resolver: zodResolver(RegisterSchema),
         defaultValues: {
         email: "",
         password: "",
+        name: "",
+        confirmPassword: "",
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
         setErrors("");
         setSuccess(""); 
         setIsPending(true);
 
         const res = await axios
-            .post('/api/auth/login', values, {
+            .post('/api/auth/register', values, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -51,7 +53,7 @@ const LoginForm = () => {
             })
             .then((response) => {
                 setSuccess(response.data.message);
-                router.push("/");
+                router.push("/login");
             })
             .catch((error) => {
                 const errMessage = error.response?.data?.error || error.message;
@@ -65,9 +67,9 @@ const LoginForm = () => {
     return (
         <>
             <CardWrapper
-                headerLabel="Welcome back"
-                backButonLabel="Don't have an account"
-                backButonHref="/register"
+                headerLabel="Create an account"
+                backButonLabel="Already have an account?"
+                backButonHref="/login"
                 showSocial
             >
             <Form {...form}>
@@ -76,6 +78,22 @@ const LoginForm = () => {
                 className="space-y-6"
                 >
                     <div className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                            <Input {...field}
+                            placeholder="John Doe"
+                            type="name" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )
+                    }
+                    />
                     <FormField
                         control={form.control}
                         name="email"
@@ -108,11 +126,27 @@ const LoginForm = () => {
                         )
                     }
                     />
+                    <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                            <Input {...field}
+                            placeholder="******"
+                            type="password" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )
+                    }
+                    />
                     </div>
                     <FormErrors message={errors} />
                     <FormSuccess message={success} />
                     <Button className="w-full" type="submit" disabled={isPending}>
-                    Login
+                    Register
                     </Button>
                 </form>
             </Form>
@@ -121,4 +155,4 @@ const LoginForm = () => {
     )
 }
 
-export default LoginForm
+export default RegisterForm
