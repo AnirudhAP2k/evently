@@ -36,6 +36,11 @@ jobs:
           # Install dependencies
           npm install --production
 
+          # Prisam setup
+          npx prisma validate
+
+          npx prisma migrate dev
+
           # Build application
           npm run build
 
