@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <section className="w-screen h-screen items-center flex justify-center">
+    <section className="h-screen items-center flex justify-center">
       <LoginButton>
         <Button variant="default" className="size-fit px-4 py-2">
           SignIn
