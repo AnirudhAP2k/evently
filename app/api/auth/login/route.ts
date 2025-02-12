@@ -23,34 +23,26 @@ export const POST = async (req: NextRequest) => {
             await signIn("credentials", {
                 email,
                 password,
-                redirectTo: false
-            })
+                redirect: false,
+            });
         } catch (error: any) {
+            console.error(error.message);
             if(error instanceof AuthError) {
                 switch (error.type) {
-                    case "CredentialsSignIn":
-                        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-                    default:
-                        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+                    case "CredentialsSignin": {
+                        return NextResponse.json({ error: error.message }, { status: 400 });
+                    }
+                    case "OAuthSignInError": {
+                        return NextResponse.json({ error: "OAuth SignIn Failed" }, { status: 400 });
+                    }
+                    default: {
+                        return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+                    }
                 }
             }
-            throw error;
         }
 
-        // const user = await prisma.user.findUnique({
-        //     where: { email }
-        // });
-
-        // if (!user) {
-        //     return NextResponse.json({ error: "User not found" }, { status: 404 });
-        // }
-
-        // const isValid = user.password && (await bcrypt.compare(password, user.password));
-        // if (!isValid) {
-        //     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
-        // }
-
-        return NextResponse.json({ message: "Login Successful", user: user }, { status: 200 });
+        return NextResponse.json({ message: "Login Successful" }, { status: 200 });
     } catch (error: any) {
         console.error(error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
