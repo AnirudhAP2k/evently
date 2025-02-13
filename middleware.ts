@@ -4,9 +4,8 @@ import authConfig from "@/auth.config"
 const { auth } = NextAuth(authConfig)
 
 export default auth((req: any) => {
-    const isLoogedIn = !!req.auth;
-    console.log(isLoogedIn);
-    
+    const isLoggedIn = !!req.auth;
+    console.log(isLoggedIn);
 })
 
 export const config = {

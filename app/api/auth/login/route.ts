@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { LoginSchema } from "@/lib/validation";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { getUserByEmail } from "@/data/user";
+import bcrypt from "bcryptjs";
 
 export const POST = async (req: NextRequest) => {
     if (req.method !== "POST") {
@@ -14,10 +16,22 @@ export const POST = async (req: NextRequest) => {
         const validated = LoginSchema.safeParse(data);
         
         if (!validated.success) {
-            return NextResponse.json({ error: "Incorrect Credentials" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid Credentials" }, { status: 400 });
         }
 
         const { email, password } = validated.data;
+
+        const user = await getUserByEmail(email);
+        
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        
+        const isValid = user.password && (await bcrypt.compare(password, user.password));
+
+        if (!isValid) {
+            return NextResponse.json({ error: "Invalid Password" }, { status: 400 });
+        }
 
         try {
             await signIn("credentials", {
@@ -30,7 +44,7 @@ export const POST = async (req: NextRequest) => {
             if(error instanceof AuthError) {
                 switch (error.type) {
                     case "CredentialsSignin": {
-                        return NextResponse.json({ error: error.message }, { status: 400 });
+                        return NextResponse.json({ error: "Invalid Credentials" }, { status: 400 });
                     }
                     case "OAuthSignInError": {
                         return NextResponse.json({ error: "OAuth SignIn Failed" }, { status: 400 });
