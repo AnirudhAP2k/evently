@@ -2,6 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { auth, signOut, signIn } from '@/auth'
+import { Button } from '../ui/button'
+import NavItems from './NavItems'
+import MobileNav from './MobileNav'
 
 const Navbar = async () => {
   const session = await auth();
@@ -13,39 +16,50 @@ const Navbar = async () => {
         <Link href='/' className='w-36'>
             <Image src='/assets/images/logo.svg' width={128} height={128} alt='logo' />
         </Link>
-
-        <div className='flex w-32 justify-end'>
-        <div className='flex items-center gap-5'>
-          { session && session?.user ? (
-              <>
-                <Link href="/startup/create">
-                  <span>Create</span>
-                </Link>
+        { session && session?.user && (
+          <nav className='hidden md:flex-between w-full max-w-xs gap-5'>
+            <NavItems />
+          </nav>
+        )}
+        <div className='flex justify-end'>
+          <div className='flex items-center gap-5'>
+            { session && session?.user ? (
+                <>
+                  <form
+                    // className="hidden md:block"
+                     action={async () => {
+                        "use server";
+                        await signOut( { redirectTo: "/" })
+                    }}>
+                    <Button className="rounded-full" size="lg" type="submit">
+                      Logout
+                    </Button>
+                  </form>
+                  <Link href={`/user/${session?.user?.id}`}>
+                    <Image
+                      src={session?.user?.image}
+                      alt={session?.user?.name}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                      sizes="lg"
+                    />
+                  </Link>
+                  <MobileNav />
+                </>
+              ) : (
                 <form action={async () => {
-                      "use server";
-                      await signOut( { redirectTo: "/" })
-                  }}>
-                  <button type="submit">
-                    <span>Logout</span>
-                  </button>
-                </form>
-                <Link href={`/user/${session?.id}`}>
-                  <span>{session?.user?.name}</span>
-                </Link>
-              </>
-            ) : (
-              <form action={async () => {
-                      "use server";
-                      await signIn()
-                  }
-              }>
-              <button type="submit">
-                <span>Login</span>
-              </button>
-            </form>
-            )
-          }
-        </div>
+                        "use server";
+                        await signIn()
+                    }
+                }>
+                  <Button asChild className="rounded-full" size="lg">
+                      <Link href="/login">Login</Link>
+                    </Button>
+              </form>
+              )
+            }
+          </div>
         </div>
       </div>
     </header>
