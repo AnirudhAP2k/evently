@@ -1,11 +1,14 @@
 import VerificationForm from '@/components/auth/VerificationForm'
-import React from 'react'
+import SkeletonCard from '@/components/SkeletonCard'
+import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <div>
-      <VerificationForm />
-    </div>
+    <Suspense fallback={ <SkeletonCard /> }>
+      <div>
+        <VerificationForm />
+      </div>
+    </Suspense>
   )
 }
 
