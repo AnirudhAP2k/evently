@@ -26,3 +26,7 @@ export const eventDefaultValues = {
     endDateTime: new Date(),
     categoryId: "",
 }
+
+export const tokenVerificationBaseLink = `${process.env.BASE_URL}/verify-token?token=`
+
+export const passwordResetTokenBaseLink = `${process.env.BASE_URL}/new-password?token=`
