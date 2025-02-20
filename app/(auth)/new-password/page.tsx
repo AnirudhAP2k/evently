@@ -1,11 +1,14 @@
 import SetNewPasswordForm from '@/components/auth/SetNewPasswordForm'
-import React from 'react'
+import SkeletonCard from '@/components/SkeletonCard'
+import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <div>
-      <SetNewPasswordForm />
-    </div>
+    <Suspense fallback={<SkeletonCard />}>
+      <div>
+        <SetNewPasswordForm />
+      </div>
+    </Suspense>
   )
 }
 
