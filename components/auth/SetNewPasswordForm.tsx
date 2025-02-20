@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchema } from "@/lib/validation";
+import { SetNewPasswordSchema } from "@/lib/validation";
 import { z } from 'zod';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
@@ -19,35 +19,33 @@ import
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { FormErrors } from "@/components/FormErrors";
-import { FormSuccess } from '@/components/FormSuccess';
-import { useRouter } from 'next/navigation';
+import { FormSuccess } from "@/components/FormSuccess";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const RegisterForm = () => {
+const SetNewPasswordForm = () => {
     const [errors, setErrors] = useState("");
     const [success, setSuccess] = useState("");
-    const [warningColor, setWarningColor] = useState("destructive");
     const [isPending, setIsPending] = useState(false);
 
+    const searchParams = useSearchParams();
     const router = useRouter();
+    const token = searchParams.get('token');
 
-    const form = useForm<z.infer<typeof RegisterSchema>>({
-        resolver: zodResolver(RegisterSchema),
+    const form = useForm<z.infer<typeof SetNewPasswordSchema>>({
+        resolver: zodResolver(SetNewPasswordSchema),
         defaultValues: {
-        email: "",
         password: "",
-        name: "",
         confirmPassword: "",
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+    const onSubmit = async (values: z.infer<typeof SetNewPasswordSchema>) => {
         setErrors("");
         setSuccess("");
-        setWarningColor(""); 
         setIsPending(true);
 
         const res = await axios
-            .post('/api/auth/register', values, {
+            .post(`/api/auth/set-password?token=${token}`, values, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -55,8 +53,9 @@ const RegisterForm = () => {
             })
             .then((response) => {
                 setSuccess(response.data.message);
+                router.push("/login");
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 const errMessage = error.response?.data?.error || error.message;
                 setErrors(errMessage);
             })
@@ -68,10 +67,9 @@ const RegisterForm = () => {
     return (
         <>
             <CardWrapper
-                headerLabel="Create an account"
-                backButonLabel="Already have an account?"
+                headerLabel="Create new password"
+                backButonLabel="Back to login"
                 backButonHref="/login"
-                showSocial
             >
             <Form {...form}>
                 <form
@@ -79,38 +77,6 @@ const RegisterForm = () => {
                 className="space-y-6"
                 >
                     <div className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                            <Input {...field}
-                            placeholder="John Doe"
-                            type="name" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )
-                    }
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                            <Input {...field}
-                            placeholder="john.doe@example.com"
-                            type="email" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )
-                    }
-                    />
                     <FormField
                         control={form.control}
                         name="password"
@@ -141,13 +107,13 @@ const RegisterForm = () => {
                             <FormMessage />
                         </FormItem>
                         )
-                    }
+                      }
                     />
                     </div>
                     <FormErrors message={errors} />
                     <FormSuccess message={success} />
                     <Button className="w-full" type="submit" disabled={isPending}>
-                    Register
+                      Reset password
                     </Button>
                 </form>
             </Form>
@@ -156,4 +122,4 @@ const RegisterForm = () => {
     )
 }
 
-export default RegisterForm
+export default SetNewPasswordForm
