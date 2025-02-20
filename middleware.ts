@@ -1,11 +1,13 @@
 import NextAuth from "next-auth"
 import authConfig from "@/auth.config"
+import { redirect } from "next/navigation"
+import { defaultRoute } from "./routes";
  
 const { auth } = NextAuth(authConfig)
+// const router = useRouter();
 
 export default auth((req: any) => {
     const isLoggedIn = !!req.auth;
-    console.log(isLoggedIn);
 })
 
 export const config = {
