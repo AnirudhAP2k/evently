@@ -3,7 +3,10 @@ import { LoginSchema } from "@/lib/validation";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { getUserByEmail } from "@/data/user";
+import { genVerificationToken } from "@/lib/tokens";
 import bcrypt from "bcryptjs";
+import { sendMail } from "@/lib/mailer";
+import { tokenVerificationBaseLink } from "@/constants";
 
 export const POST = async (req: NextRequest) => {
     if (req.method !== "POST") {
@@ -31,6 +34,27 @@ export const POST = async (req: NextRequest) => {
 
         if (!isValid) {
             return NextResponse.json({ error: "Invalid Password" }, { status: 400 });
+        }
+
+        if(!user.emailVerified) {
+            const verificationToken = await genVerificationToken(email);
+
+            if(!verificationToken) {
+                return NextResponse.json({ error: "Unable to generate verification token. Please try again later!" }, { status: 500 });
+            }
+
+            const verificationEmail = await sendMail({
+                email: process.env.SENDER_EMAIL || "alerts@evently.com",
+                sendTo: verificationToken.email,
+                subject: "Verify your email address",
+                html: `<p>To verify your email, please <a href="${tokenVerificationBaseLink}${verificationToken.token}">click here</a>. <br></br> This link will expire in 1 hour.</p>`
+            });
+
+            if(!verificationEmail) {
+                return NextResponse.json({ error: "Unable to send verification token. Please try again later!" }, { status: 500 });
+            }
+            
+            return NextResponse.json({ error: "Email not verified. Verification email sent" }, { status: 300 });
         }
 
         try {

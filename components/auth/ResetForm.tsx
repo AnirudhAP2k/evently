@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from "@/lib/validation";
+import { ResetSchema } from "@/lib/validation";
 import { z } from 'zod';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
@@ -20,31 +20,26 @@ import
 import { Button } from "@/components/ui/button";
 import { FormErrors } from "@/components/FormErrors";
 import { FormSuccess } from "@/components/FormSuccess";
-import { useRouter } from "next/navigation";
-import Link from 'next/link';
 
-const LoginForm = () => {
+const ResetForm = () => {
     const [errors, setErrors] = useState("");
     const [success, setSuccess] = useState("");
     const [isPending, setIsPending] = useState(false);
 
-    const router = useRouter();
-
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
+    const form = useForm<z.infer<typeof ResetSchema>>({
+        resolver: zodResolver(ResetSchema),
         defaultValues: {
-        email: "",
-        password: "",
+        email: ""
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof ResetSchema>) => {
         setErrors("");
         setSuccess("");
         setIsPending(true);
 
         const res = await axios
-            .post('/api/auth/login', values, {
+            .post('/api/auth/password-reset', values, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -52,7 +47,6 @@ const LoginForm = () => {
             })
             .then((response) => {
                 setSuccess(response.data.message);
-                router.push("/");
             })
             .catch((error: any) => {
                 const errMessage = error.response?.data?.error || error.message;
@@ -66,10 +60,9 @@ const LoginForm = () => {
     return (
         <>
             <CardWrapper
-                headerLabel="Welcome back"
-                backButonLabel="Don't have an account"
-                backButonHref="/register"
-                showSocial
+                headerLabel="Forgot your password"
+                backButonLabel="Back to login"
+                backButonHref="/login"
             >
             <Form {...form}>
                 <form
@@ -93,37 +86,11 @@ const LoginForm = () => {
                         )
                     }
                     />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                            <Input {...field}
-                            placeholder="******"
-                            type="password" />
-                            </FormControl>
-                            <Button
-                                size="sm"
-                                variant="link"
-                                asChild
-                                className="px-0 font-normal"
-                            >
-                                <Link href="/reset">
-                                    Forgot password?
-                                </Link>
-                            </Button>
-                            <FormMessage />
-                        </FormItem>
-                        )
-                    }
-                    />
                     </div>
                     <FormErrors message={errors} />
                     <FormSuccess message={success} />
                     <Button className="w-full" type="submit" disabled={isPending}>
-                    Login
+                        Send reset email
                     </Button>
                 </form>
             </Form>
@@ -132,4 +99,4 @@ const LoginForm = () => {
     )
 }
 
-export default LoginForm
+export default ResetForm

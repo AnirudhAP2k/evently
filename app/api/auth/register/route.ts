@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { RegisterSchema } from "@/lib/validation";
 import { getUserByEmail } from "@/data/user";
+import { genVerificationToken } from "@/lib/tokens";
+import { sendMail } from "@/lib/mailer";
+import { tokenVerificationBaseLink } from "@/constants";
 
 export const POST = async (req: NextRequest) => {
     if (req.method !== "POST") {
@@ -26,6 +29,19 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json({ error: "User already exists" }, { status: 400 });
         }
 
+        const verificationToken = await genVerificationToken(email);
+        
+        const verificationEmail = await sendMail({
+            email: process.env.SENDER_EMAIL || "alerts@evently.com",
+            sendTo: verificationToken.email,
+            subject: "Verify your email address",
+            html: `<p>To verify your email, please <a href="${tokenVerificationBaseLink}${verificationToken.token}">click here</a>. <br></br> This link will expire in 1 hour.</p>`
+        });
+        
+        if(!verificationEmail) {
+            return NextResponse.json({ error: "Unable to send verification token. Please try again later!" }, { status: 300 });
+        }
+        
         const salt = await bcryptjs.genSalt();
         const hashedPassword = await bcryptjs.hash(password, salt);
 
@@ -33,7 +49,7 @@ export const POST = async (req: NextRequest) => {
             data: { name, email, password: hashedPassword },
         });
 
-        return NextResponse.json({ message: "User created successfully", user: newUser }, { status: 201 });
+        return NextResponse.json({ message: "Verification email sent", user: newUser }, { status: 201 });
     } catch (error) {
         console.error("Error creating user:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

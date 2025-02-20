@@ -1,10 +1,10 @@
-import RegisterForm from '@/components/auth/RegisterForm'
+import SetNewPasswordForm from '@/components/auth/SetNewPasswordForm'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <RegisterForm />
+      <SetNewPasswordForm />
     </div>
   )
 }
