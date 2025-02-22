@@ -20,7 +20,7 @@ model User {
   role                  UserRole @default(User)
   emailVerified         DateTime?
   isTwoFactorEnabled    Boolean @default(false)
-  twoFactorConfirmation TwoFatorConfirmation[]
+  twoFactorConfirmation TwoFactorConfirmation[]
   image                 String?
   accounts              Account[]
 
@@ -74,7 +74,7 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
-model TwoFatorToken {
+model TwoFactorToken {
   id            String    @id @default(cuid())
   email         String
   token         String    @unique
@@ -86,7 +86,7 @@ model TwoFatorToken {
   @@unique([email, token])
 }
 
-model TwoFatorConfirmation {
+model TwoFactorConfirmation {
   id            String  @id @default(cuid())
   userId        String
   user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
