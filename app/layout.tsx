@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -12,9 +12,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Evently",
   description: "Event management tool",
-  icons: {
-    icon: '/assets/images/logo.svg'
-  }
 };
 
 export default function RootLayout({
