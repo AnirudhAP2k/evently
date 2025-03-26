@@ -56,7 +56,7 @@ export const EventCreateSchema = z.object({
     }).max(100, {
         message: "Location should be atmost 100 characters"
     }),
-    imageUrl: z.string().url(),
+    image: z.instanceof(File, { message: "An image file is required." }),
     startDateTime: z.date(),
     endDateTime: z.date(),
     categoryId: z.string(),
