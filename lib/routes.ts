@@ -3,6 +3,8 @@ export const defaultRoute = '/';
 export const authRoutes = [
     '/register',
     '/login',
+    '/reset',
+    '/verify-token'
 ];
 
 export const publicRoutes = [
