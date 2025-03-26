@@ -3,13 +3,12 @@ import Link from 'next/link'
 import React from 'react'
 import { auth, signOut, signIn } from '@/auth'
 import { Button } from '../ui/button'
-import NavItems from './NavItems'
-import MobileNav from './MobileNav'
+import NavItems from '@/components/shared/NavItems'
+import MobileNav from '@/components/shared/MobileNav'
 
 const Navbar = async () => {
   const session = await auth();
-  console.log("session",session);
-  
+
   return (
     <header className='w-full border-b'>
       <div className='wrapper flex items-center justify-between'>

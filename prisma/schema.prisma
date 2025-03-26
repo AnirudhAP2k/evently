@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("MONGODB_CONNECTION_URI")
 }
 
 generator client {
@@ -13,22 +13,28 @@ enum UserRole {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  accounts      Account[]
-  role          UserRole @default(User)
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String?
+  email                 String?
+  password              String?
+  role                  UserRole                @default(User)
+  emailVerified         DateTime?
+  isTwoFactorEnabled    Boolean                 @default(false)
+  twoFactorConfirmation TwoFactorConfirmation[]
+  image                 String?
+  accounts              Account[]
+  events                Events[]
+  orders                Orders[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([email])
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
   type              String
   provider          String
   providerAccountId String
@@ -39,20 +45,19 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   @@unique([provider, providerAccountId])
 }
 
 model VerificationToken {
-  id            String    @id @default(cuid())
-  email         String
-  token         String    @unique
-  expiresAt     DateTime
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String   @unique
+  expiresAt DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -61,13 +66,83 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id            String    @id @default(cuid())
-  email         String
-  token         String    @unique
-  expiresAt     DateTime
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String
+  expiresAt DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, token])
+}
+
+model TwoFactorConfirmation {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId])
+}
+
+model Events {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  location      String
+  image         String?
+  startDateTime DateTime @default(now())
+  endDateTime   DateTime @default(now())
+  price         String?
+  isFree        Boolean  @default(false)
+  url           String?
+  userId        String   @db.ObjectId
+  categoryId    String   @db.ObjectId
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  organizer     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Orders        Orders[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  label  String
+  events Events[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([label])
+}
+
+model Orders {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  stripeId    String?
+  totalAmount String
+  eventId     String  @db.ObjectId
+  buyerId     String  @db.ObjectId
+  event       Events  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  buyer       User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([stripeId])
 }
