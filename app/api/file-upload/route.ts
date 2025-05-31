@@ -8,9 +8,9 @@ export const POST = async (req: NextRequest) => {
     try {
         const formData = await req.formData();
         const body = Object.fromEntries(formData);
-        const file = body.file as File | null;
+        const file = body.file as File | undefined;
 
-        if (!file) {
+        if (!file || file === undefined) {
             return NextResponse.json({ success: false, message: "No file uploaded" }, { status: 400 });
         }
 
@@ -20,7 +20,8 @@ export const POST = async (req: NextRequest) => {
             fs.mkdirSync(UPLOAD_DIR, { recursive: true });
         }
 
-        const filename = `${Date.now()}-${file.name}`; 
+        const sanitizedFileName = file.name.replace(/\s+/g, "_");
+        const filename = `${Date.now()}-${sanitizedFileName}`;
         const filePath = path.resolve(UPLOAD_DIR, filename);
         fs.writeFileSync(filePath, buffer);
 
@@ -29,8 +30,8 @@ export const POST = async (req: NextRequest) => {
         return NextResponse.json({
             success: true,
             name: filename,
-            url: fileUrl,
-        });
+            imageUrl: fileUrl,
+        }, { status: 200 });
     } catch (error: any) {
         console.error("File upload error:", error);
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
