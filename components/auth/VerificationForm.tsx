@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
-import { FormSuccess } from '../FormSuccess';
-import { FormErrors } from '../FormErrors';
+import { FormSuccess } from '@/components/FormSuccess';
+import { FormErrors } from '@/components/FormErrors';
 
 const VerificationForm = () => {
     const [errors, setErrors] = useState("");
