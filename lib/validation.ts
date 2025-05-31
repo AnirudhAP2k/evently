@@ -64,3 +64,10 @@ export const EventCreateSchema = z.object({
     isFree: z.boolean(),
     url: z.string().url(),
 });
+
+export const EventSubmitSchema = EventCreateSchema.omit({ image: true }).extend({
+    userId: z.string(),
+    imageUrl: z.string(),
+    startDateTime: z.string().transform((str) => new Date(str)),
+    endDateTime: z.string().transform((str) => new Date(str)),
+});
