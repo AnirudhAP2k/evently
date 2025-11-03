@@ -1,5 +1,6 @@
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
+import { SessionProvider } from 'next-auth/react';
 
 export default function RootLayout({
     children,
@@ -9,9 +10,11 @@ export default function RootLayout({
     return (
       <div className="flex h-screen flex-col">
         <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
+        <SessionProvider>
+          <main className="flex-1">
+            {children}
+          </main>
+        </SessionProvider>
         <Footer />
       </div>
     );
