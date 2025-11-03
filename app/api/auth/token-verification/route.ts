@@ -9,7 +9,8 @@ export const GET = async (req: NextRequest) => {
     }
 
     try {
-        const token = req.nextUrl.searchParams.get('token');
+        const { searchParams } = req.nextUrl;
+        const token = searchParams.get('token');
         
         if (!token) {
             return NextResponse.json({ error: "Verification token missing!" }, { status: 400 });
@@ -47,7 +48,7 @@ export const GET = async (req: NextRequest) => {
 
         return NextResponse.json({ message: "Email verified successfully" }, { status: 201 });
     } catch (error) {
-        console.error("Error creating user:", error);
+        console.error("Error verifying token:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 };
