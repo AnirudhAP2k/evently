@@ -4,12 +4,13 @@ export const authRoutes = [
     '/register',
     '/login',
     '/reset',
-    '/verify-token'
+    '/verify-token',
+    '/new-password',
 ];
 
 export const publicRoutes = [
     '/',
-    '/about'
+    '/about',
 ];
 
 export const protectedRoutes = [
