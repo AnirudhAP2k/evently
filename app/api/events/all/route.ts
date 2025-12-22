@@ -24,6 +24,7 @@ export const GET = async (req: NextRequest) => {
             skip: 0,
             take: limit,
         });
+console.log(events);
 
         const eventsCount = await prisma.events.count(conditions);
 

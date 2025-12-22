@@ -27,6 +27,8 @@ const Home = () => {
             },
         })
         .then((response) => {
+            console.log(response);
+            
             setEvents(response.data.data);
             setTotalPages(response.data.totalPages);
         })
