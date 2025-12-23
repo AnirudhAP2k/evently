@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        publicId: uploadResult.public_id,
-        imageUrl: uploadResult.secure_url,
+        publicId: uploadResult.public_id || null,
+        imageUrl: uploadResult.secure_url || null,
       },
       { status: 200 }
     );
