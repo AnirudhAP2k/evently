@@ -18,7 +18,7 @@ export const GET = async (req: NextRequest) => {
             ...conditions,
             include: {
                 category: true,
-                organizer: true,
+                // organizer: true,
             },
             orderBy: { createdAt: "desc" },
             skip: 0,

@@ -39,11 +39,6 @@ const page = ({ params }: { params: Promise<SearchParamProps['params']> }) => {
     useEffect(() => {
         getEvent();
     }, [getEvent]);
-    
-
-    useEffect(() => {
-        console.log("Event data : ", event);
-    }, [event]);
 
     return (
         <section className="flex justify-center bg-primary-50 bg-dotted-pattern bg-contain">

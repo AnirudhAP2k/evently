@@ -27,6 +27,6 @@ export const eventDefaultValues = {
     categoryId: "",
 }
 
-export const tokenVerificationBaseLink = `${process.env.BASE_URL}/verify-token?token=`
+export const tokenVerificationBaseLink = `${process.env.NEXTAUTH_URL}/verify-token?token=`
 
-export const passwordResetTokenBaseLink = `${process.env.BASE_URL}/new-password?token=`
+export const passwordResetTokenBaseLink = `${process.env.NEXTAUTH_URL}/new-password?token=`

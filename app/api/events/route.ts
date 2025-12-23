@@ -46,7 +46,7 @@ export const GET = async (req: NextRequest) => {
             where: { id: eventId },
             include: {
                 category: true,
-                organizer: true,
+                // organizer: true,
             }
         });
 

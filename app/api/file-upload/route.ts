@@ -1,39 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import fs from "fs";
+import cloudinary from "@/lib/cloudinary";
 
-const UPLOAD_DIR = path.resolve(process.cwd(), "public/uploads");
+export async function POST(req: NextRequest) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
 
-export const POST = async (req: NextRequest) => {
-    try {
-        const formData = await req.formData();
-        const body = Object.fromEntries(formData);
-        const file = body.file as File | undefined;
-
-        if (!file || file === undefined) {
-            return NextResponse.json({ success: false, message: "No file uploaded" }, { status: 400 });
-        }
-
-        const buffer = Buffer.from(await file.arrayBuffer());
-
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-        }
-
-        const sanitizedFileName = file.name.replace(/\s+/g, "_");
-        const filename = `${Date.now()}-${sanitizedFileName}`;
-        const filePath = path.resolve(UPLOAD_DIR, filename);
-        fs.writeFileSync(filePath, buffer);
-
-        const fileUrl = `/uploads/${filename}`;
-
-        return NextResponse.json({
-            success: true,
-            name: filename,
-            imageUrl: fileUrl,
-        }, { status: 200 });
-    } catch (error: any) {
-        console.error("File upload error:", error);
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    if (!file) {
+      return NextResponse.json(
+        { success: false, message: "No file uploaded" },
+        { status: 400 }
+      );
     }
-};
+
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        { success: false, message: "Only images are allowed" },
+        { status: 400 }
+      );
+    }
+
+    const MAX_SIZE = process.env.MAX_SIZE ? Number.parseInt(process.env.MAX_SIZE) : 5 * 1024 * 1024;
+
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json(
+        { success: false, message: "File too large (max 5MB)" },
+        { status: 400 }
+      );
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "uploads",
+          resource_type: "image",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          resolve(result);
+        }
+      ).end(buffer);
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        publicId: uploadResult.public_id,
+        imageUrl: uploadResult.secure_url,
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("File upload error:", error);
+    return NextResponse.json(
+      { success: false, message: "Upload failed" },
+      { status: 500 }
+    );
+  }
+}
