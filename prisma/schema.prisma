@@ -18,7 +18,7 @@ model User {
   name                  String?
   email                 String?
   password              String?
-  role                  OrganizationRole        @default(MEMBER)
+  role                  OrganizationRole?       @default(MEMBER)
   emailVerified         DateTime?
   isTwoFactorEnabled    Boolean                 @default(false)
   twoFactorConfirmation TwoFactorConfirmation[]
