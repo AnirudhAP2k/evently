@@ -103,23 +103,23 @@ model TwoFactorConfirmation {
 }
 
 model Events {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   title          String
   description    String
   location       String
   image          String?
-  startDateTime  DateTime     @default(now())
-  endDateTime    DateTime     @default(now())
+  startDateTime  DateTime      @default(now())
+  endDateTime    DateTime      @default(now())
   price          String?
-  isFree         Boolean      @default(false)
+  isFree         Boolean       @default(false)
   url            String?
-  organizationId String       @db.ObjectId
-  categoryId     String       @db.ObjectId
-  category       Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?       @db.ObjectId
+  categoryId     String        @db.ObjectId
+  category       Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   Orders         Orders[]
-  userId         String?      @db.ObjectId
-  User           User?        @relation(fields: [userId], references: [id])
+  userId         String?       @db.ObjectId
+  User           User?         @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
