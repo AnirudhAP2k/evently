@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const MAX_SIZE = process.env.MAX_SIZE ? Number.parseInt(process.env.MAX_SIZE) : 5 * 1024 * 1024;
+    const MAX_SIZE = process.env.MAX_UPLOAD_SIZE ? Number.parseInt(process.env.MAX_UPLOAD_SIZE) : 5 * 1024 * 1024;
 
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
