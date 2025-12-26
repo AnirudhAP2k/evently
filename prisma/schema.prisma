@@ -1,6 +1,6 @@
 datasource db {
-  provider = "mongodb"
-  url      = env("MONGODB_CONNECTION_URI")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -14,7 +14,7 @@ enum OrganizationRole {
 }
 
 model User {
-  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  id                    String                  @id @default(uuid()) @db.Uuid
   name                  String?
   email                 String?
   password              String?
@@ -35,8 +35,8 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @db.Uuid()
   type              String
   provider          String
   providerAccountId String
@@ -56,7 +56,7 @@ model Account {
 }
 
 model VerificationToken {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
   email     String
   token     String   @unique
   expiresAt DateTime
@@ -68,7 +68,7 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
   email     String
   token     String
   expiresAt DateTime
@@ -80,7 +80,7 @@ model PasswordResetToken {
 }
 
 model TwoFactorToken {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid()) @db.Uuid
   email     String
   token     String
   expiresAt DateTime
@@ -92,8 +92,8 @@ model TwoFactorToken {
 }
 
 model TwoFactorConfirmation {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -103,7 +103,7 @@ model TwoFactorConfirmation {
 }
 
 model Events {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  id             String        @id @default(uuid()) @db.Uuid
   title          String
   description    String
   location       String
@@ -113,12 +113,12 @@ model Events {
   price          String?
   isFree         Boolean       @default(false)
   url            String?
-  organizationId String?       @db.ObjectId
-  categoryId     String        @db.ObjectId
+  organizationId String?       @db.Uuid
+  categoryId     String        @db.Uuid
   category       Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   Orders         Orders[]
-  userId         String?       @db.ObjectId
+  userId         String?       @db.Uuid
   User           User?         @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
@@ -126,7 +126,7 @@ model Events {
 }
 
 model Category {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  id     String   @id @default(uuid()) @db.Uuid
   label  String
   events Events[]
 
@@ -137,12 +137,12 @@ model Category {
 }
 
 model Organization {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(uuid()) @db.Uuid
   name        String
   industry    String?
   description String?
   website     String?
-  createdBy   String  @db.ObjectId
+  createdBy   String  @db.Uuid
 
   members OrganizationMember[]
   events  Events[]
@@ -152,9 +152,9 @@ model Organization {
 }
 
 model OrganizationMember {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String           @db.ObjectId
-  organizationId String           @db.ObjectId
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String           @db.Uuid
+  organizationId String           @db.Uuid
   role           OrganizationRole @default(MEMBER)
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -167,11 +167,11 @@ model OrganizationMember {
 }
 
 model Orders {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(uuid()) @db.Uuid
   stripeId    String?
   totalAmount String
-  eventId     String  @db.ObjectId
-  buyerId     String  @db.ObjectId
+  eventId     String  @db.Uuid
+  buyerId     String  @db.Uuid
   event       Events  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   buyer       User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
 
