@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import authConfig from "@/auth.config";
 import { getUserById } from "./data/user";
-import { UserRole } from "@prisma/client";
+import { OrganizationRole } from "@prisma/client";
 import { getTwoFactorConfirmationbyUserId } from "@/data/two-factor-confirmation";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -55,7 +55,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
 
             if (token.role && session.user) {
-                session.user.role = token.role as UserRole;
+                session.user.role = token.role as OrganizationRole;
             }
             return session;
         },
