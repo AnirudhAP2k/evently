@@ -137,12 +137,14 @@ model Category {
 }
 
 model Organization {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   name        String
-  industry    String?
+  industryId  String   @db.Uuid
+  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
   description String?
   website     String?
-  createdBy   String  @db.Uuid
+  logo        String?
+  createdBy   String   @db.Uuid
 
   members OrganizationMember[]
   events  Events[]
@@ -179,4 +181,15 @@ model Orders {
   updatedAt DateTime @updatedAt
 
   @@unique([stripeId])
+}
+
+model Industry {
+  id           String         @id @default(uuid()) @db.Uuid
+  label        String
+  organization Organization[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([label])
 }
