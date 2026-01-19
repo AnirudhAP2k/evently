@@ -3,12 +3,44 @@
 import { prisma } from "@/lib/db";
 import { handleError, parseData } from "@/lib/utils";
 
-interface CreateCategoryProps {
-    categoryName: string
+interface CreateOptionProps {
+    optionName: string
+    optionType: 'category' | 'industry';
 }
 
-export const createCategory = async ({ categoryName }: CreateCategoryProps) => {
+interface CreateCategoryProps {
+    categoryName: string;
+}
+
+interface CreateIndustryProps {
+    industryName: string;
+}
+
+interface GetAllOptionsProps {
+    optionType: 'category' | 'industry';
+}
+
+export const createOption = async ({ optionName, optionType }: CreateOptionProps) => {
     try {
+        let option = null;
+        switch (optionType) {
+            case 'category':
+                option = await createCategory({ categoryName: optionName });
+                break;
+            
+            case 'industry':
+                option = await createIndustry({ industryName: optionName });
+                break;
+        }
+
+        return option;
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const createCategory = async ({ categoryName }: CreateCategoryProps) => {
+     try {
         const category = await prisma.category.create({
             data: { label: categoryName }
         });
@@ -19,11 +51,51 @@ export const createCategory = async ({ categoryName }: CreateCategoryProps) => {
     }
 };
 
+export const createIndustry = async ({ industryName }: CreateIndustryProps) => {
+    try {
+        const industry = await prisma.industry.create({
+            data: { label: industryName }
+        });
+
+        return parseData(industry);
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const getAllOptions = async ({ optionType }: GetAllOptionsProps) => {
+    try {
+        let options = [];
+        switch (optionType) {
+            case 'category':
+                options = await getAllCategories();
+                break;  
+            case 'industry':
+                options = await getAllIndustries();
+                break;
+        }
+
+        return options;
+    } catch (error) {
+        handleError(error);
+    }
+};
+
 export const getAllCategories = async () => {
     try {
         const categories = await prisma.category.findMany();
 
         return parseData(categories);
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const getAllIndustries = async () => {
+    try {
+        const industries = await prisma.industry.findMany();
+
+        return parseData(industries);
     } catch (error) {
         handleError(error);
     }
