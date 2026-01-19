@@ -1,4 +1,4 @@
-import React, { startTransition, use, useEffect, useState } from 'react'
+import React, { startTransition, useEffect, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -19,34 +19,37 @@ import {
 } from "@/components/ui/alert-dialog";  
 import { Category } from '@prisma/client';
 import { Input } from '../ui/input';
-import { createCategory, getAllCategories } from '@/actions/category.actions';
+import { createOption, getAllOptions } from '@/actions/category.actions';
+import { OptionsTypes } from '@/constants';
 
 interface DropdownProps {
     value: string
     onChangeHandler?: () => void
+    type?: 'category' | 'industry'
 }
 
-const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [newCategory, setNewCategory] = useState('');
+const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
+    const [options, setOptions] = useState<OptionsTypes[]>([]);
+    const [newOption, setNewOption] = useState('');
 
-    const handleAddCategory = async () => {
-        await createCategory({
-            categoryName: newCategory.trim()
+    const handleAddOption = async () => {
+        await createOption({
+            optionName: newOption.trim(),
+            optionType: type || 'category'
         })
-        .then((category) => {
-            setCategories((prevSate) => [...prevSate, category]);
+        .then((option) => {
+            setOptions((prevSate) => [...prevSate, option]);
         })
     }
 
     useEffect(() => {
-        const getCategories = async () => {
-            const categoryList = await getAllCategories();
-            
-            categoryList && setCategories(categoryList as Category[]);
+        const getOptions = async () => {
+            const optionList = await getAllOptions({ optionType: type || 'category' });
+
+            optionList && setOptions(optionList as OptionsTypes[]);
         }
 
-        getCategories();
+        getOptions();
     }, []);
 
     return (
@@ -55,13 +58,13 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
                 <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-                { categories.length > 0 && categories.map((category) => (
+                { options.length > 0 && options.map((option) => (
                     <SelectItem
-                        key={category.id}
-                        value={category.id}
+                        key={option.id}
+                        value={option.id}
                         className="select-item p-regular-14"
                     >
-                        {category.label}
+                        {option.label}
                     </SelectItem>
 
                 ))}
@@ -72,12 +75,12 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
                         <AlertDialogHeader>
                             <AlertDialogTitle>New Category</AlertDialogTitle>
                             <AlertDialogDescription>
-                                <Input type="text" placeholder="Category name" className="input-field mt-3" onChange={(e) => { setNewCategory(e.target.value) }} />
+                                <Input type="text" placeholder="Category name" className="input-field mt-3" onChange={(e) => { setNewOption(e.target.value) }} />
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => {startTransition(handleAddCategory)}}>Add</AlertDialogAction>
+                            <AlertDialogAction onClick={() => {startTransition(handleAddOption)}}>Add</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
