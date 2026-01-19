@@ -46,7 +46,7 @@ const EventsForm = ({ userId, type }: EventsFormProps) => {
         title: "",
         description: "",
         location: "",
-        image: undefined,
+        image: null,
         startDateTime: new Date(),
         endDateTime: new Date(),
         categoryId: "",
