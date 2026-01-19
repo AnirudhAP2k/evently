@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { CloudUpload, X } from "lucide-react";
 
 interface FileUploaderProps {
-    image: File | undefined;
+    image: File | undefined | null;
     onFieldChange: (value: File | null) => void;
     setFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
