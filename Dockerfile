@@ -54,7 +54,7 @@ RUN npm run build
 FROM base as final
 
 # Use production node environment by default.
-ENV NODE_ENV development
+ENV NODE_ENV production
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
