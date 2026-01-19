@@ -56,7 +56,9 @@ export const EventCreateSchema = z.object({
     }).max(100, {
         message: "Location should be atmost 100 characters"
     }),
-    image: z.instanceof(File, { message: "An image file is required." }),
+    image: z.instanceof(File, { message: "An image file is required." })
+        .nullable()
+        .optional(),
     startDateTime: z.date(),
     endDateTime: z.date(),
     categoryId: z.string(),
@@ -68,6 +70,36 @@ export const EventCreateSchema = z.object({
 export const EventSubmitSchema = EventCreateSchema.omit({ image: true }).extend({
     userId: z.string(),
     imageUrl: z.string(),
+    startDateTime: z.string().transform((str) => new Date(str)),
+    endDateTime: z.string().transform((str) => new Date(str)),
+});
+
+export const OrganizationCreateSchema = z.object({
+    name: z.string().min(3, {
+        message: "Name should be atlest 3 characters"
+    }).max(20, {
+        message: "Name should be atmost 20 characters"
+    }),
+    industry: z.string().min(3, {
+        message: "Industry should be atlest 3 characters"
+    }).max(20, {
+        message: "Industry should be atmost 20 characters"
+    }),
+    description: z.string().min(5, {
+        message: "Description should be atlest 5 characters"
+    }).max(400, {
+        message: "Description should be atmost 400 characters"
+    }),
+    website: z.string().url(),
+    logo: z.instanceof(File, { message: "An image file is required." })
+        .nullable()
+        .optional(),
+});
+
+
+export const OrganizationSubmitSchema = OrganizationCreateSchema.omit({ logo: true }).extend({
+    userId: z.string(),
+    logoUrl: z.string(),
     startDateTime: z.string().transform((str) => new Date(str)),
     endDateTime: z.string().transform((str) => new Date(str)),
 });
