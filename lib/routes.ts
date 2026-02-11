@@ -18,5 +18,8 @@ export const protectedRoutes = [
     '/profile'
 ];
 
+export const apiAuthRoutes = "/api/auth";
 
-export const apiAuthRoutes = "/api/auth"; 
+export const onboardingRoutes = [
+    '/onboarding'
+];

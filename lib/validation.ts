@@ -75,31 +75,32 @@ export const EventSubmitSchema = EventCreateSchema.omit({ image: true }).extend(
 });
 
 export const OrganizationCreateSchema = z.object({
-    name: z.string().min(3, {
-        message: "Name should be atlest 3 characters"
-    }).max(20, {
-        message: "Name should be atmost 20 characters"
+    name: z.string().min(2, {
+        message: "Organization name must be at least 2 characters"
+    }).max(100, {
+        message: "Organization name must be at most 100 characters"
     }),
-    industry: z.string().min(3, {
-        message: "Industry should be atlest 3 characters"
-    }).max(20, {
-        message: "Industry should be atmost 20 characters"
+    industryId: z.string().uuid({
+        message: "Please select an industry"
     }),
     description: z.string().min(5, {
-        message: "Description should be atlest 5 characters"
-    }).max(400, {
-        message: "Description should be atmost 400 characters"
-    }),
-    website: z.string().url(),
+        message: "Description should be at least 5 characters"
+    }).max(500, {
+        message: "Description should be at most 500 characters"
+    }).optional(),
+    website: z.string().url({
+        message: "Please enter a valid website URL"
+    }).optional().or(z.literal("")),
+    location: z.string().max(100, {
+        message: "Location should be at most 100 characters"
+    }).optional(),
+    size: z.enum(["STARTUP", "SME", "ENTERPRISE"]).optional(),
     logo: z.instanceof(File, { message: "An image file is required." })
         .nullable()
         .optional(),
 });
 
-
 export const OrganizationSubmitSchema = OrganizationCreateSchema.omit({ logo: true }).extend({
     userId: z.string(),
     logoUrl: z.string(),
-    startDateTime: z.string().transform((str) => new Date(str)),
-    endDateTime: z.string().transform((str) => new Date(str)),
 });
