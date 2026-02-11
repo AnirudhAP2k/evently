@@ -32,6 +32,7 @@ const createOrganizationSchema = z.object({
     website: z.string().url("Invalid website URL").optional().or(z.literal("")),
     location: z.string().max(100).optional(),
     size: z.enum(["STARTUP", "SME", "ENTERPRISE"]).optional(),
+    logo: z.string().url().optional(),
 });
 
 const updateOrganizationSchema = z.object({
@@ -65,6 +66,7 @@ export async function createOrganization(formData: FormData) {
             website: formData.get("website") || undefined,
             location: formData.get("location") || undefined,
             size: formData.get("size") || undefined,
+            logo: formData.get("logo") || undefined,
         };
 
         const validatedData = createOrganizationSchema.parse(rawData);

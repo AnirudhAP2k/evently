@@ -29,8 +29,10 @@ import {
 import FileUploader from "@/components/shared/FileUploader";
 import { FormErrors } from "@/components/FormErrors";
 import { FormSuccess } from "@/components/FormSuccess";
-import { createOrganization } from "@/actions/organization";
+import { createOrganization } from "@/actions/organization.actions";
 import { OrganizationSize } from "@prisma/client";
+import Dropdown from "./Dropdown";
+import { handleUpload } from "@/lib/file-uploader";
 
 interface OrganizationFormProps {
   userId: string;
@@ -64,9 +66,7 @@ const OrganizationForm = ({
     },
   });
 
-  const onSubmit = async (
-    values: z.infer<typeof OrganizationCreateSchema>
-  ) => {
+  const onSubmit = async (values: z.infer<typeof OrganizationCreateSchema>) => {
     setError("");
     setSuccess("");
 
@@ -76,20 +76,13 @@ const OrganizationForm = ({
 
         // Upload logo if provided
         if (files.length > 0) {
-          const formData = new FormData();
-          formData.append("file", files[0]);
+          const { imageUrl } = await handleUpload(files);
 
-          const upload = await fetch("/api/file-upload", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!upload.ok) {
+          if (!imageUrl) {
             throw new Error("Failed to upload logo");
           }
 
-          const data = await upload.json();
-          logoUrl = data.url;
+          logoUrl = imageUrl;
         }
 
         // Create FormData for server action
@@ -146,26 +139,13 @@ const OrganizationForm = ({
           control={form.control}
           name="industryId"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-full">
               <FormLabel>Industry *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isPending}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an industry" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {industries.map((industry) => (
-                    <SelectItem key={industry.id} value={industry.id}>
-                      {industry.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Dropdown
+                onChangeHandler={field.onChange}
+                value={field.value}
+                type="industry"
+              />
               <FormMessage />
             </FormItem>
           )}

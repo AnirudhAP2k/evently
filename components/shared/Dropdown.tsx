@@ -16,7 +16,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";  
+} from "@/components/ui/alert-dialog";
 import { Category } from '@prisma/client';
 import { Input } from '../ui/input';
 import { createOption, getAllOptions } from '@/actions/category.actions';
@@ -37,9 +37,9 @@ const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
             optionName: newOption.trim(),
             optionType: type || 'category'
         })
-        .then((option) => {
-            setOptions((prevSate) => [...prevSate, option]);
-        })
+            .then((option) => {
+                setOptions((prevSate) => [...prevSate, option]);
+            })
     }
 
     useEffect(() => {
@@ -55,10 +55,10 @@ const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
     return (
         <Select onValueChange={onChangeHandler} defaultValue={value}>
             <SelectTrigger className="select-field">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder={`${type || 'category'}`} />
             </SelectTrigger>
             <SelectContent>
-                { options.length > 0 && options.map((option) => (
+                {options.length > 0 && options.map((option) => (
                     <SelectItem
                         key={option.id}
                         value={option.id}
@@ -70,17 +70,17 @@ const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
                 ))}
 
                 <AlertDialog>
-                    <AlertDialogTrigger className="p-medium-14 flex w-full rounded-sm py-3 pl-8 text-primary-500 hover:bg-primary-50 focus:text-primary-500">Add new category</AlertDialogTrigger>
+                    <AlertDialogTrigger className="p-medium-14 flex w-full rounded-sm py-3 pl-8 text-primary-500 hover:bg-primary-50 focus:text-primary-500">Add new {type || 'category'}</AlertDialogTrigger>
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
-                            <AlertDialogTitle>New Category</AlertDialogTitle>
+                            <AlertDialogTitle>New {type || 'category'}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                <Input type="text" placeholder="Category name" className="input-field mt-3" onChange={(e) => { setNewOption(e.target.value) }} />
+                                <Input type="text" placeholder={`${type || 'category'} name`} className="input-field mt-3" onChange={(e) => { setNewOption(e.target.value) }} />
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => {startTransition(handleAddOption)}}>Add</AlertDialogAction>
+                            <AlertDialogAction onClick={() => { startTransition(handleAddOption) }}>Add</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

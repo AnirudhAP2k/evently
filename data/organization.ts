@@ -99,6 +99,7 @@ export async function createOrganization(data: {
     website?: string;
     location?: string;
     size?: OrganizationSize;
+    logo?: string;
     createdBy: string;
 }) {
     try {
@@ -121,6 +122,7 @@ export async function createOrganization(data: {
                     website: data.website,
                     location: data.location,
                     size: data.size || "STARTUP",
+                    logo: data.logo,
                     createdBy: data.createdBy,
                 },
                 include: {
