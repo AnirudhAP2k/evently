@@ -31,6 +31,7 @@ import FileUploader from "@/components/shared/FileUploader";
 import { FormErrors } from "@/components/FormErrors";
 import { FormSuccess } from "@/components/FormSuccess";
 import axios from "axios";
+import Dropdown from "@/components/shared/Dropdown";
 
 interface OrganizationFormProps {
   userId: string;
@@ -99,10 +100,8 @@ const OrganizationForm = ({
         let response;
 
         if (type === "Create") {
-          // Create organization via API
           response = await axios.post("/api/organizations", apiData);
         } else {
-          // Update organization via API
           response = await axios.put(`/api/organizations/${organizationId}`, apiData);
         }
 
@@ -155,24 +154,14 @@ const OrganizationForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Industry *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isPending}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an industry" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {industries.map((industry) => (
-                    <SelectItem key={industry.id} value={industry.id}>
-                      {industry.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <Dropdown
+                  onChangeHandler={field.onChange}
+                  value={field.value}
+                  disabled={isPending}
+                  type="industry"
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
