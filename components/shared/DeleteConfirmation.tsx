@@ -18,17 +18,17 @@ import {
 
 const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
   const pathname = usePathname();
-  let [isPending, startTransition] = useTransition();
-  let [response, setResponse] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
+  const [response, setResponse] = useState<string>("");
 
   const handleDeleteEvent = useCallback(
     async ({ eventId, path }: { eventId: string; path: string }) => {
       await axios
         .delete(`/api/events?id=${eventId}&path=${path}`)
         .then((response) => {
-            const message = response.data.message || 'Event deleted successfully';
-            console.log(message);
-            setResponse(message);
+          const message = response.data.message || 'Event deleted successfully';
+          console.log(message);
+          setResponse(message);
         })
         .catch((error) => {
           const errMessage = error.response?.data?.error || error.message;
