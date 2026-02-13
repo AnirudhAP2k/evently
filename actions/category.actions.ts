@@ -93,7 +93,11 @@ export const getAllOptions = async ({ optionType }: GetAllOptionsProps) => {
 
 export const getAllCategories = async () => {
     try {
-        const categories = await prisma.category.findMany();
+        const categories = await prisma.category.findMany({
+            orderBy: {
+                label: "asc",
+            },
+        });
 
         return parseData(categories);
     } catch (error) {
