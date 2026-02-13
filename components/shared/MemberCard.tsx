@@ -14,7 +14,7 @@ interface MemberCardProps {
     member: {
         id: string;
         role: string;
-        joinedAt: Date;
+        createdAt: Date;
         user: {
             id: string;
             name: string | null;
@@ -85,7 +85,7 @@ const MemberCard = ({
                         {member.user.email && <span>{member.user.email}</span>}
                         <span>•</span>
                         <span>
-                            Joined {formatDistanceToNow(new Date(member.joinedAt))} ago
+                            Joined {formatDistanceToNow(new Date(member.createdAt))} ago
                         </span>
                     </div>
                 </div>

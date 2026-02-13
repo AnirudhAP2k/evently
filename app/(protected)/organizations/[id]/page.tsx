@@ -1,4 +1,5 @@
-import { auth } from "@/auth";
+'use client';
+
 import { redirect, notFound } from "next/navigation";
 import axios from "axios";
 import OrganizationHeader from "@/components/shared/OrganizationHeader";
@@ -8,38 +9,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { Edit, Users, Calendar, ExternalLink } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import React from "react";
 
 interface OrganizationProfilePageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
-const OrganizationProfilePage = async ({ params }: OrganizationProfilePageProps) => {
-    const session = await auth();
+const OrganizationProfilePage = ({ params }: OrganizationProfilePageProps) => {
+    const { data: session, status } = useSession();
     const userId = session?.user?.id;
+    const [organization, setOrganization] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    if (!userId) {
+    console.log("userId", session);
+    console.log("session status", status);
+
+    const unwrappedParams = React.use(params);
+    const id = unwrappedParams.id;
+
+    useEffect(() => {
+        if (status === "loading") return;
+
+        const fetchOrganization = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(
+                    `/api/organizations/${id}`,
+                );
+
+                if (response.status !== 200) {
+                    notFound();
+                }
+
+                setOrganization(response.data);
+            } catch (error) {
+                console.error("Error fetching organization:", error);
+                notFound();
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrganization();
+    }, [id, status]);
+
+    if (status === "loading" || loading || !organization) {
+        return (
+            <div className="wrapper py-8">
+                <div className="flex justify-center items-center min-h-[400px]">
+                    <p className="text-gray-500">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === "unauthenticated") {
         redirect("/login");
     }
 
-    // Fetch organization data
-    let organization;
-    try {
-        const response = await axios.get(
-            `/api/organizations/${params.id}`,
-        );
-
-        if (response.status !== 200) {
-            notFound();
-        }
-
-        organization = response.data;
-    } catch (error) {
-        notFound();
-    }
-
-    // Check if current user is a member
     const currentUserMembership = organization.members.find(
         (m: any) => m.userId === userId
     );
@@ -53,7 +83,7 @@ const OrganizationProfilePage = async ({ params }: OrganizationProfilePageProps)
                 {/* Organization Header */}
                 <OrganizationHeader organization={organization}>
                     {canEdit && (
-                        <Link href={`/organizations/${params.id}/edit`}>
+                        <Link href={`/organizations/${id}/edit`}>
                             <Button variant="outline" className="gap-2">
                                 <Edit className="w-4 h-4" />
                                 Edit
@@ -61,7 +91,7 @@ const OrganizationProfilePage = async ({ params }: OrganizationProfilePageProps)
                         </Link>
                     )}
                     {canManageMembers && (
-                        <Link href={`/organizations/${params.id}/members`}>
+                        <Link href={`/organizations/${id}/members`}>
                             <Button className="gap-2">
                                 <Users className="w-4 h-4" />
                                 Manage Members
@@ -124,7 +154,7 @@ const OrganizationProfilePage = async ({ params }: OrganizationProfilePageProps)
                             ))}
                             {organization.members.length > 5 && (
                                 <div className="text-center pt-4">
-                                    <Link href={`/organizations/${params.id}/members`}>
+                                    <Link href={`/organizations/${id}/members`}>
                                         <Button variant="outline">
                                             View All {organization.members.length} Members
                                         </Button>

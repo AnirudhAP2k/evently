@@ -17,10 +17,11 @@ const OrganizationUpdateSchema = z.object({
 // GET /api/organizations/[id] - Get organization details
 export const GET = async (
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) => {
     try {
-        const organizationId = params.id;
+        const data = await params;
+        const organizationId = data.id;
 
         if (!organizationId) {
             return NextResponse.json(
