@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { OrganizationCreateSchema } from "@/lib/validation";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { handleUpload } from "@/lib/file-uploader";
 
 import {
   Form,
@@ -29,16 +30,14 @@ import {
 import FileUploader from "@/components/shared/FileUploader";
 import { FormErrors } from "@/components/FormErrors";
 import { FormSuccess } from "@/components/FormSuccess";
-import { createOrganization } from "@/actions/organization.actions";
-import { OrganizationSize } from "@prisma/client";
-import Dropdown from "./Dropdown";
-import { handleUpload } from "@/lib/file-uploader";
+import axios from "axios";
 
 interface OrganizationFormProps {
   userId: string;
   type: "Create" | "Update";
   industries: { id: string; label: string }[];
   initialData?: any;
+  organizationId?: string;
 }
 
 const OrganizationForm = ({
@@ -46,6 +45,7 @@ const OrganizationForm = ({
   type,
   industries,
   initialData,
+  organizationId,
 }: OrganizationFormProps) => {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -72,9 +72,9 @@ const OrganizationForm = ({
 
     startTransition(async () => {
       try {
-        let logoUrl = "";
+        let logoUrl = initialData?.logo || "";
 
-        // Upload logo if provided
+        // Upload logo if new file provided
         if (files.length > 0) {
           const { imageUrl } = await handleUpload(files);
 
@@ -85,27 +85,41 @@ const OrganizationForm = ({
           logoUrl = imageUrl;
         }
 
-        // Create FormData for server action
-        const formData = new FormData();
-        formData.append("name", values.name);
-        formData.append("industryId", values.industryId);
-        if (values.description) formData.append("description", values.description);
-        if (values.website) formData.append("website", values.website);
-        if (values.location) formData.append("location", values.location);
-        if (values.size) formData.append("size", values.size);
-        if (logoUrl) formData.append("logo", logoUrl);
+        // Prepare data for API
+        const apiData = {
+          name: values.name,
+          industryId: values.industryId,
+          description: values.description,
+          website: values.website,
+          location: values.location,
+          size: values.size,
+          logo: logoUrl,
+        };
 
-        const result = await createOrganization(formData);
+        let response;
 
-        if (result.error) {
-          setError(result.error);
+        if (type === "Create") {
+          // Create organization via API
+          response = await axios.post("/api/organizations", apiData);
         } else {
-          setSuccess("Organization created successfully!");
-          setTimeout(() => {
-            router.push("/dashboard");
-            router.refresh();
-          }, 1000);
+          // Update organization via API
+          response = await axios.put(`/api/organizations/${organizationId}`, apiData);
         }
+
+        if (!response.data.success) {
+          throw new Error(response.data.error || "Operation failed");
+        }
+
+        setSuccess(response.data.message);
+
+        setTimeout(() => {
+          if (type === "Create") {
+            router.push("/dashboard");
+          } else {
+            router.push(`/organizations/${organizationId}`);
+          }
+          router.refresh();
+        }, 1000);
       } catch (err: any) {
         setError(err?.message || "Something went wrong");
       }
@@ -139,13 +153,26 @@ const OrganizationForm = ({
           control={form.control}
           name="industryId"
           render={({ field }) => (
-            <FormItem className="w-full">
+            <FormItem>
               <FormLabel>Industry *</FormLabel>
-              <Dropdown
-                onChangeHandler={field.onChange}
-                value={field.value}
-                type="industry"
-              />
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isPending}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an industry" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {industries.map((industry) => (
+                    <SelectItem key={industry.id} value={industry.id}>
+                      {industry.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -260,7 +287,13 @@ const OrganizationForm = ({
         <FormSuccess message={success} />
 
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Creating..." : "Create Organization"}
+          {isPending
+            ? type === "Create"
+              ? "Creating..."
+              : "Updating..."
+            : type === "Create"
+              ? "Create Organization"
+              : "Update Organization"}
         </Button>
       </form>
     </Form>
