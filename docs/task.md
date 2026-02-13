@@ -24,18 +24,19 @@
   - [ ] Update context when switching orgs
 
 ## Phase 2: Event Module
-- [ ] Event creation
-  - [ ] Create event form (title, description, date, location)
-  - [ ] Event type selection (online/offline)
-  - [ ] Event visibility (public/private)
-  - [ ] Category selection
-  - [ ] Image upload for events
-  - [ ] Link event to active organization
-- [ ] Event listing & discovery
-  - [ ] Public events listing page
-  - [ ] Filter by category, date, location
-  - [ ] Search events by title/description
-  - [ ] Event detail page
+- [x] Event creation
+  - [x] Create event form (title, description, date, location)
+  - [x] Event type selection (online/offline/hybrid)
+  - [x] Event visibility (public/private/invite-only)
+  - [x] Category selection
+  - [x] Image upload for events
+  - [x] Link event to active organization
+  - [x] Capacity limit (maxAttendees)
+- [x] Event listing & discovery
+  - [x] Public events listing page
+  - [x] Filter by category, date, location
+  - [x] Search events by title/description
+  - [x] Event detail page
   - [ ] My organization's events page
 - [ ] Event management
   - [ ] Edit event details
