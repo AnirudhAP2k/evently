@@ -16,6 +16,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
+
 const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
