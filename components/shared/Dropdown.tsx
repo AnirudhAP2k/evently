@@ -17,7 +17,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Category } from '@prisma/client';
 import { Input } from '../ui/input';
 import { createOption, getAllOptions } from '@/actions/category.actions';
 import { OptionsTypes } from '@/constants';
@@ -26,9 +25,10 @@ interface DropdownProps {
     value: string
     onChangeHandler?: () => void
     type?: 'category' | 'industry'
+    disabled?: boolean
 }
 
-const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
+const Dropdown = ({ value, onChangeHandler, type, disabled }: DropdownProps) => {
     const [options, setOptions] = useState<OptionsTypes[]>([]);
     const [newOption, setNewOption] = useState('');
 
@@ -53,7 +53,7 @@ const Dropdown = ({ value, onChangeHandler, type }: DropdownProps) => {
     }, []);
 
     return (
-        <Select onValueChange={onChangeHandler} defaultValue={value}>
+        <Select onValueChange={onChangeHandler} defaultValue={value} disabled={disabled}>
             <SelectTrigger className="select-field">
                 <SelectValue placeholder={`${type || 'category'}`} />
             </SelectTrigger>
