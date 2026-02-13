@@ -33,7 +33,6 @@ export const GET = async (
         const session = await auth();
         const userId = session?.user?.id;
 
-        // Fetch organization with members and events
         const organization = await prisma.organization.findUnique({
             where: { id: organizationId },
             include: {
